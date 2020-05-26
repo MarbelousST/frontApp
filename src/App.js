@@ -15,29 +15,53 @@ function App() {
     cache: 'default',
   };
 
+  const URL = process.env.REACT_APP_API_URL
+  const PORT = process.env.REACT_APP_API_PORT
+  const APIV1 = process.env.REACT_APP_API_V1
+  const APIV2 = process.env.REACT_APP_API_V2
+  const CALCULAEDAD = process.env.REACT_APP_API_CALCULAEDAD
+
+
   const handleGetApi = (url) => {
     fetch(url, miInitGet)
       .then((response) => {
         return response.text();
       })
       .then((data) => {
-        console.log(data);
+        alert(data)
       });
   };
+
+  const obj = JSON.stringify({nombre, fechaNacimiento})
+  console.log(obj) 
+
+  const endpointCalcularEdad = URL + ':' + PORT + CALCULAEDAD
+  const endpointApiV1 = URL + ':' + PORT + APIV1
+  const endpointApiV2 = URL + ':' + PORT + APIV2
+
+  console.log({endpointApiV1})
+
+
   const handlePost = (event) => {
     console.log(event.target);
+    event.preventDefault();
     fetch('http://104.196.130.222:8080/api/calcularEdad', {
       method: 'POST',
-      // We convert the React state to JSON and send it as the POST body
-      body: JSON.stringify({ nombre, fechaNacimiento }),
+      body: obj,
+      headers: {
+        'Content-Type': 'application/json'
+      },
     })
       .then((response) => {
-        return response.text();
+        return response.json();
       })
       .then((data) => {
-        setEdad(data);
+        setEdad(data.edad);
       });
   };
+
+
+
   const handleChange = (event) => {
     if (event.target.name === 'nombre') {
       setName(event.target.value);
@@ -46,10 +70,9 @@ function App() {
     }
   };
 
-  console.log(edad);
 
   return (
-    <div className='App'>
+    <div className='App' >
       <header className='App-header'>
         <img src={logo} className='App-logo' alt='logo' />
         <p>PoC para el pipeline de cloud</p>
@@ -91,8 +114,11 @@ function App() {
               onChange={handleChange}
             />
           </label>
-          <input type='submit' value='Envíar' />
+          <input type='submit' value='Calcular Edad' />
         </form>
+        {edad && <span>
+        Hola {nombre} Tienes {edad} 
+      </span>}
       </header>
     </div>
   );
